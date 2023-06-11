@@ -5,10 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserRelation extends Model
+class UserFollow extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_id', 'following_user_id'
+        'user_id', 'following'
     ];
+
+    public function userRelations()
+    {
+        return $this->hasMany(User::class);
+    }
 }

@@ -16,13 +16,13 @@ return new class extends Migration
         Schema::create('post_comments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('post_id');
-            $table->unsignedBigInteger('user_id');
+            $table->uuid('user_id');
             $table->foreign('post_id')
                 ->references('id')
                 ->on('posts')
                 ->onDelete('cascade');
             $table->foreign('user_id')
-                ->references('id')
+                ->references('uuid')
                 ->on('users')
                 ->onDelete('cascade');
             $table->longText('comment');

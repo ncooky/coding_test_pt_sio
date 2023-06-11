@@ -3,30 +3,38 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Services\UserService;
+use App\Utils\Response;
 
 class PassportAuthController extends Controller
 {
+    use Response;
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     /**
      * Registration
      */
     public function register(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|min:4',
+            'username' => 'required|min:4',
             'email' => 'required|email',
             'password' => 'required|min:8',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password)
-        ]);
+        $user = $this->userService->register($request);
 
-        $token = $user->createToken('LaravelAuthApp')->accessToken;
-
-        return response()->json(['token' => $token], 200);
+        switch ($user['status']) {
+            case false:
+                return $this->responseError($user['message'], 500);
+            default:
+                return $this->responseData(['token' => $user['token']]);
+        }
     }
 
     /**
@@ -34,16 +42,14 @@ class PassportAuthController extends Controller
      */
     public function login(Request $request)
     {
-        $data = [
-            'email' => $request->email,
-            'password' => $request->password
-        ];
 
-        if (auth()->attempt($data)) {
-            $token = auth()->user()->createToken('LaravelAuthApp')->accessToken;
-            return response()->json(['token' => $token], 200);
-        } else {
-            return response()->json(['error' => 'Unauthorised'], 401);
+        $user = $this->userService->login($request);
+
+        switch ($user['status']) {
+            case false:
+                return $this->responseError($user['message'], 500);
+            default:
+                return $this->responseData(['token' => $user['token']]);
         }
     }
 }

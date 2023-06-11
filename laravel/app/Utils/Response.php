@@ -19,13 +19,13 @@ trait Response
     {
         if ($message != null) {
             return new JsonResponse([
-                'result' => true,
+                'success' => true,
                 'message' => $message,
                 'data'   => $data,
             ], 200);
         }
         return new JsonResponse([
-            'result' => true,
+            'success' => true,
             'data'      => $data,
         ], 200);
     }
@@ -34,12 +34,12 @@ trait Response
     {
         if ($message != null) {
             return new JsonResponse([
-                'result' => false,
+                'success' => false,
                 'message' => $message,
             ], $status);
         }
         return new JsonResponse([
-            'result'    => false,
+            'success'    => false,
             'mesage'    => $message,
         ], $status);
     }
@@ -49,13 +49,13 @@ trait Response
     {
         if ($count == null) {
             return new JsonResponse([
-                'result'    => true,
+                'success'    => true,
                 'count'      => count($data),
                 'data'      => $data
             ], 200);
         } else {
             return new JsonResponse([
-                'result' => true,
+                'success' => true,
                 'count' => $count - 1,
                 'data' => $data
             ], 200);
@@ -65,7 +65,7 @@ trait Response
     public function responseValidation($validation, $data = null)
     {
         return new JsonResponse([
-            'result' => false,
+            'success' => false,
             'data' => $data,
             'message' => $validation,
         ], 422);

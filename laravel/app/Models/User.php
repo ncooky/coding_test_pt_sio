@@ -18,10 +18,12 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'uuid',
         'username',
         'firstname',
         'lastname',
         'image',
+        'phone_number',
         'dob',
         'email',
         'password',
@@ -53,6 +55,6 @@ class User extends Authenticatable
 
     public function userRelations()
     {
-        return $this->hasMany(UserRelation::class);
+        return $this->hasMany(UserFollow::class);
     }
 }

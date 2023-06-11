@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('post_id')->nullable(false);
             $table->longText('image');
+            $table->integer('order');
             $table->foreign('post_id')
                 ->references('id')
                 ->on('posts')

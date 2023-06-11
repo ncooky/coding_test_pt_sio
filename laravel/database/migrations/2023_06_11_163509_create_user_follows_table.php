@@ -13,16 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user_relations', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('following_user_id');
+        Schema::create('user_follows', function (Blueprint $table) {
+            $table->uuid('user_id');
+            $table->uuid('following');
             $table->foreign('user_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
-            $table->foreign('following_user_id')
-                ->references('id')
+                ->references('uuid')
+                ->on('users');
+            $table->foreign('following')
+                ->references('uuid')
                 ->on('users');
             $table->timestamps();
         });
@@ -35,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_relations');
+        Schema::dropIfExists('user_follows');
     }
 };
