@@ -15,13 +15,12 @@ return new class extends Migration
     {
         Schema::create('post_images', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('post_id')->nullable(false);
+            $table->uuid('post_id');
             $table->longText('image');
             $table->integer('order');
             $table->foreign('post_id')
-                ->references('id')
-                ->on('posts')
-                ->onDelete('cascade');
+                ->references('uuid')
+                ->on('posts');
             $table->timestamps();
         });
     }

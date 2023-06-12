@@ -9,6 +9,6 @@ class PostImages extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'post_id', 'image'
+        'post_id', 'image', 'order'
     ];
 }

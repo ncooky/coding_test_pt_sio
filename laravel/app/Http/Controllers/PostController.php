@@ -22,43 +22,74 @@ class PostController extends Controller
         return $this->pingResponse();
     }
 
+    /** 
+     * Show User Posts
+     */
     public function index()
     {
-        $posts = auth()->user()->posts;
-        return $this->responseData($posts);
+
+        $posts = $this->postService->index();
+        switch ($posts['status']) {
+            case false:
+                return $this->responseError($posts['message'], 500);
+            default:
+                return $this->responseData($posts['post_data']);
+        }
     }
 
+    /** 
+     * Show User Post by ID
+     */
     public function show($id)
     {
-        $post = auth()->user()->posts()->find($id);
 
-        if (!$post) {
-            return $this->responseDataNotFound('Post not found');
+        $posts = $this->postService->show($id);
+        switch ($posts['status']) {
+            case false:
+                return $this->responseError($posts['message'], 500);
+            default:
+                return $this->responseData($posts['post_data']);
         }
-
-        return $this->responseData($post->toArray());
     }
 
+    /** 
+     * Save new Post
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
             'title' => 'required',
-            'description' => 'required'
+            'caption' => 'required',
+            'image' => 'required',
+            'image.*' => '|image|mimes:png,jpg,jpeg|max:2048'
         ]);
 
-        $post = new Post();
-        $post->title = $request->title;
-        $post->description = $request->description;
-
-        if (auth()->user()->posts()->save($post))
-            return response()->json([
-                'success' => true,
-                'data' => $post->toArray()
-            ]);
-        else
-            return $this->responseError('Post not added', 500);
+        $post = $this->postService->store($request);
+        switch ($post['status']) {
+            case false:
+                return $this->responseError($post['message'], 500);
+            default:
+                return $this->responseData($post['data']);
+        }
     }
 
+    /**
+     * Destroy Post
+     */
+    public function destroy($id)
+    {
+        $post = $this->postService->destroy($id);
+        switch ($post['status']) {
+            case false:
+                return $this->responseError($post['message'], 500);
+            default:
+                return $this->responseData(['message' => "success deleted"]);
+        }
+    }
+
+    /** 
+     * Update Post By ID
+     */
     public function update(Request $request, $id)
     {
         $post = auth()->user()->posts()->find($id);
@@ -83,26 +114,46 @@ class PostController extends Controller
             ], 500);
     }
 
-    public function destroy($id)
+    /**
+     * Do Like Post
+     */
+    public function like($id)
     {
-        $post = auth()->user()->posts()->find($id);
-
-        if (!$post) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Post not found'
-            ], 400);
+        $post = $this->postService->postLikes($id);
+        switch ($post['status']) {
+            case false:
+                return $this->responseError($post['message'], 500);
+            default:
+                return $this->responseData(['message' => "success updated"]);
         }
+    }
 
-        if ($post->delete()) {
-            return response()->json([
-                'success' => true
-            ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Post can not be deleted'
-            ], 500);
+    /**
+     * Do Unlike Post
+     */
+    public function unlike($id)
+    {
+        $post = $this->postService->destroyLike($id);
+        switch ($post['status']) {
+            case false:
+                return $this->responseError($post['message'], 500);
+            default:
+                return $this->responseData(['message' => "success dislike post"]);
+        }
+    }
+
+    /**
+     * Do Comment Post
+     */
+    public function comments(Request $request, $id)
+    {
+        $data = $request->only('comment');
+        $post = $this->postService->postComment($data['comment'], $id);
+        switch ($post['status']) {
+            case false:
+                return $this->responseError($post['message'], 500);
+            default:
+                return $this->responseData(['message' => "success updated"]);
         }
     }
 }

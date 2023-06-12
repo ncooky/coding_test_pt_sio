@@ -24,12 +24,15 @@ use App\Models\PostLikes;
 Route::post('register', [PassportAuthController::class, 'register']);
 Route::post('login', [PassportAuthController::class, 'login']);
 Route::middleware('auth:api')->group(function () {
-    Route::resource('posts', PostController::class);
+    // Route Post
+    Route::get('posts',  [PostController::class, 'index'])->name('post.list');
+    Route::get('posts/{id}',  [PostController::class, 'show'])->name('post.get');
     Route::get('posts/ping', [PostController::class, 'ping']);
-
-    Route::resource('posts/images', PostImages::class);
-    Route::resource('posts/likes', PostLikes::class);
-    Route::resource('posts/comments', PostComments::class);
+    Route::post('posts/new',  [PostController::class, 'store'])->name('post.new');
+    Route::post('posts/like/{id}',  [PostController::class, 'like'])->name('post.like');
+    Route::delete('posts/like/{id}',  [PostController::class, 'unlike'])->name('post.like.delete');
+    Route::post('posts/comments/{id}',  [PostController::class, 'comments'])->name('post.comments');
+    Route::delete('posts/{id}',  [PostController::class, 'destroy'])->name('post.delete');
 
     // Route User
     Route::get('user', [UserController::class, 'index']);
